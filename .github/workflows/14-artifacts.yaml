@@ -3,6 +3,10 @@ name: 14 - working with artifacts
 on:
   workflow_dispatch:
 
+env:
+    build-artifact-key: app-${{github.sha}}
+    test-coverage-key: test-coverage-${{github.sha}}
+
 jobs:
   test-build:
     runs-on: ubuntu-latest
@@ -28,6 +32,15 @@ jobs:
       - name: Install Dependancies
         if: steps.cache.outputs.cache-hit != 'true'
         run: npm ci
+
+      - name: Unit tests
+        run: npm run test -- --coverage
+
+      - name: upload test files
+        uses: actions/upload-artifact@v4
+        with:
+            name: ${{env.test-coverage-key}}
+            path: 14-artifacts/react-app/coverage
     
       - name: Unit tests
         run: npm run test
